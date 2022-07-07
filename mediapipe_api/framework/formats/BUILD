@@ -74,7 +74,8 @@ cc_library(
         "//mediapipe_api/external/absl:statusor",
         "//mediapipe_api/framework:packet",
         "@com_google_mediapipe//mediapipe/framework/formats:matrix",
-        "@com_google_mediapipe//mediapipe/framework/formats:matrix_data_cc_proto"
+        "@com_google_mediapipe//mediapipe/framework/formats:matrix_data_cc_proto",
+        "@com_google_mediapipe//mediapipe/framework/port:file_helpers",
     ],
     alwayslink = True,
 )

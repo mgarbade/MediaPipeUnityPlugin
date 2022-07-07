@@ -6,25 +6,37 @@
 
 #include "mediapipe_api/framework/formats/matrix_frame.h"
 
-MpReturnCode mp__MakeMatrixPacket__PKc_i(const char* matrix_data, int size, mediapipe::Packet** packet_out) {
+MpReturnCode mp__MakeMatrixPacket__PKc_i(const char* matrix_data_serialized, int size, mediapipe::Packet** packet_out) {
   TRY
     mediapipe::Matrix matrix;
 
-    // fill matrix with data from matrix_data
-    mediapipe::MatrixFromMatrixDataProto(matrix_data, matrix);
+    // convert matrix data from char into mediapipe::MatrixData
+    std::string content;
+    mediapipe::MatrixData matrix_data;
+    mediapipe::file::GetContents(matrix_data_serialized, &content);
+    CHECK(matrix_data.ParseFromString(content));
+
+    // fill matrix with data from matrix_data_serialized
+    mediapipe::MatrixFromMatrixDataProto(matrix_data, &matrix);
 
     *packet_out = new mediapipe::Packet{mediapipe::MakePacket<mediapipe::Matrix>(matrix)};
     RETURN_CODE(MpReturnCode::Success);
   CATCH_EXCEPTION
 }
 
-MpReturnCode mp__MakeMatrixPacket_At__PA_i_Rt(const char* matrix_data, int size, mediapipe::Timestamp* timestamp,
+MpReturnCode mp__MakeMatrixPacket_At__PA_i_Rt(const char* matrix_data_serialized, int size, mediapipe::Timestamp* timestamp,
                                                       mediapipe::Packet** packet_out) {
   TRY
     mediapipe::Matrix matrix;
 
-    // fill matrix with data from matrix_data
-    mediapipe::MatrixFromMatrixDataProto(matrix_data, matrix);
+    // convert matrix data from char into mediapipe::MatrixData
+    std::string content;
+    mediapipe::MatrixData matrix_data;
+    mediapipe::file::GetContents(matrix_data_serialized, &content);
+    CHECK(matrix_data.ParseFromString(content));
+
+    // fill matrix with data from matrix_data_serialized
+    mediapipe::MatrixFromMatrixDataProto(matrix_data, &matrix);
 
     *packet_out = new mediapipe::Packet{mediapipe::MakePacket<mediapipe::Matrix>(matrix).At(*timestamp)};
     RETURN_CODE(MpReturnCode::Success);
