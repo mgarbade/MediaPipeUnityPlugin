@@ -12,6 +12,7 @@
 #include "mediapipe_api/external/protobuf.h"
 #include "mediapipe_api/framework/packet.h"
 #include "mediapipe/framework/formats/matrix.h"
+#include "mediapipe/framework/port/file_helpers.h"
 
 extern "C" {
 
