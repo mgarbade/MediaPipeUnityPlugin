@@ -16,11 +16,11 @@
 
 extern "C" {
 
-MP_CAPI(MpReturnCode) mp__MakeMatrixPacket__PKc_i(const char* matrix_data_serialized, int size, mediapipe::Packet** packet_out);
-MP_CAPI(MpReturnCode) mp__MakeMatrixPacket_At__PA_i_Rt(const char* matrix_data_serialized, int size, mediapipe::Timestamp* timestamp,
+MP_CAPI(MpReturnCode) mp__MakeMatrixFramePacket__PKc_i(const char* matrix_data_serialized, int size, mediapipe::Packet** packet_out);
+MP_CAPI(MpReturnCode) mp__MakeMatrixFramePacket_At__PA_i_Rt(const char* matrix_data_serialized, int size, mediapipe::Timestamp* timestamp,
                                                                mediapipe::Packet** packet_out);
-// MP_CAPI(MpReturnCode) mp_Packet__GetMatrix(mediapipe::Packet* packet, const mediapipe::Matrix** value_out);
-// MP_CAPI(void) mp_Matrix__delete(mediapipe::Matrix* matrix);
+// MP_CAPI(MpReturnCode) mp_Packet__GetMatrixFrame(mediapipe::Packet* packet, const mediapipe::Matrix** value_out);
+// MP_CAPI(void) mp_MatrixFrame__delete(mediapipe::Matrix* matrix);
 
 }  // extern "C"
 
