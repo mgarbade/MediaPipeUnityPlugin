@@ -85,15 +85,18 @@ namespace Mediapipe.Unity
         matrix.Rows = 2;
         matrix.Cols = 3;
 
-        //var floatArray = new float[6] { 0, 1, 2, 3, 4, 5 };
-
         var input = new MatrixFramePacket(matrix.ToByteArray(), new Timestamp(i));
         graph.AddPacketToInputStream("in", input).AssertOk();
       }
       graph.CloseInputStream("in").AssertOk();
 
       Debug.Log("Poll output");
-      var output = new FloatArrayPacket();
+
+
+      // Create output container with suitable size
+      var outputFloatArray = new float[6] { 10, 11, 12, 13, 14, 15 };
+      var output = new FloatArrayPacket(outputFloatArray);
+
       while (poller.Next(output))
       {
         Debug.Log(output.Get());
