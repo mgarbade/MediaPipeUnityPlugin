@@ -82,6 +82,9 @@ namespace Mediapipe.Unity
         matrix.PackedData.Add(4);
         matrix.PackedData.Add(5);
 
+        matrix.Rows = 2;
+        matrix.Cols = 3;
+
         //var floatArray = new float[6] { 0, 1, 2, 3, 4, 5 };
 
         var input = new MatrixFramePacket(matrix.ToByteArray(), new Timestamp(i));
