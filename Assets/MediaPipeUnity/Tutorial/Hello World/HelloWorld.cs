@@ -54,7 +54,7 @@ namespace Mediapipe.Unity
           {
             [mediapipe.TfLiteInferenceCalculatorOptions.ext] 
             {
-              model_path: ""mediapipe/models/model_ar_v18s_01_mediapipe_tflite.tflite""
+              model_path: ""mediapipe/models/adder_model_single_input_2x3.tflite""
             }
           }
         }
