@@ -67,7 +67,7 @@ namespace Mediapipe.Unity
         }
       ";
       var graph = new CalculatorGraph(configText);
-      var poller = graph.AddOutputStreamPoller<float[]>("out").Value();
+      var poller = graph.AddOutputStreamPoller<List<float>>("out").Value();
 
       Debug.Log("StartRun");
       graph.StartRun().AssertOk();
@@ -95,7 +95,7 @@ namespace Mediapipe.Unity
 
       // Create output container with suitable size
       var outputFloatArray = new float[6] { 10, 11, 12, 13, 14, 15 };
-      var output = new FloatArrayPacket(outputFloatArray);
+      var output = new FloatVectorFramePacket(outputFloatArray);
 
       while (poller.Next(output))
       {
