@@ -13,8 +13,7 @@ MpReturnCode mp__MakeMatrixFramePacket__PKc_i(const char* matrix_data_serialized
     // convert matrix data from char into mediapipe::MatrixData
     std::string content;
     mediapipe::MatrixData matrix_data;
-    mediapipe::file::GetContents(matrix_data_serialized, &content);
-    CHECK(matrix_data.ParseFromString(content));
+    CHECK(matrix_data.ParseFromString(std::string(matrix_data_serialized, size)));
 
     // fill matrix with data from matrix_data_serialized
     mediapipe::MatrixFromMatrixDataProto(matrix_data, &matrix);
@@ -32,8 +31,7 @@ MpReturnCode mp__MakeMatrixFramePacket_At__PA_i_Rt(const char* matrix_data_seria
     // convert matrix data from char into mediapipe::MatrixData
     std::string content;
     mediapipe::MatrixData matrix_data;
-    mediapipe::file::GetContents(matrix_data_serialized, &content);
-    CHECK(matrix_data.ParseFromString(content));
+    CHECK(matrix_data.ParseFromString(std::string(matrix_data_serialized, size)));
 
     // fill matrix with data from matrix_data_serialized
     mediapipe::MatrixFromMatrixDataProto(matrix_data, &matrix);
