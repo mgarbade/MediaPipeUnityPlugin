@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Google.Protobuf;
+using UnityEditor;
+
 
 namespace Mediapipe.Unity
 {
@@ -43,6 +45,7 @@ namespace Mediapipe.Unity
   public class MatrixClassification : MonoBehaviour
   {
 
+    private readonly string path = "Assets/MediaPipeUnity/Samples/Scenes/Matrix Classification/skeletons_with_neck_squat_trans_36_79.mat";
     private readonly string TAG = "MatrixClassificationToyExample";
 
     private void OnEnable()
@@ -83,7 +86,7 @@ namespace Mediapipe.Unity
           {
             [mediapipe.TfLiteInferenceCalculatorOptions.ext] 
             {
-              model_path: ""mediapipe/models/adder_model_single_input_2x3.tflite""
+              model_path: ""mediapipe/models/model_ar_v18s_01_mediapipe_tflite.tflite""
             }
           }
         }
@@ -104,7 +107,7 @@ namespace Mediapipe.Unity
       graph.StartRun().AssertOk();
       for (var i = 0; i < 10; i++)
       {
-        var matrix = CreateInputData();
+        var matrix = CreateInputData(path);
 
         // feed data into graph
         var input = new MatrixFramePacket(matrix.ToByteArray(), new Timestamp(i));
@@ -134,20 +137,47 @@ namespace Mediapipe.Unity
       Debug.Log("Done");
     }
 
-    private static MatrixData CreateInputData()
+    private MatrixData CreateInputData(string path)
     {
-      var matrix = new MatrixData();
-      matrix.PackedData.Add(0);
-      matrix.PackedData.Add(1);
-      matrix.PackedData.Add(2);
-      matrix.PackedData.Add(3);
-      matrix.PackedData.Add(4);
-      matrix.PackedData.Add(5);
+      // Read data from file
+      MatrixData matrix = ReadMatAsciiWithHeader(path);
 
-      matrix.Rows = 2;
-      matrix.Cols = 3;
       return matrix;
     }
+
+
+    private MatrixData ReadMatAsciiWithHeader(string path)
+    {
+
+      Debug.Log("Create a matrix from file: " + path);
+      var data = Resources.Load<TextAsset>(path);
+      var lines = data.ToString().Split("\n");
+
+      // Get matrix shape from header [num_rows x num_cols]
+      var header = lines[0].Split(" ");
+      var nrows = int.Parse(header[0]);
+      var ncols = int.Parse(header[1]);
+      Debug.Log("matrix shape [nrows x ncols]: " + nrows + " x " + ncols);
+
+      // Fill matrix data
+      var matrix = new MatrixData();
+      matrix.Rows = nrows;
+      matrix.Cols = ncols;
+
+      for (int i = 1; i < nrows; i++)
+      {
+        var line = lines[i].Split(" ");
+        for (int j = 0; j < ncols; j++)
+        {
+          var numberAsString = line[j];
+
+          matrix.PackedData.Add(float.Parse(numberAsString));
+        }
+      }
+
+      return matrix;
+    }
+
 
     private void OnApplicationQuit()
     {
@@ -158,7 +188,7 @@ namespace Mediapipe.Unity
     private IList<WaitForResult> RequestDependentAssets()
     {
       return new List<WaitForResult> {
-          WaitForAsset("adder_model_single_input_2x3.bytes"),
+          WaitForAsset("model_ar_v18s_01_mediapipe_tflite.bytes"),
         };
     }
 
