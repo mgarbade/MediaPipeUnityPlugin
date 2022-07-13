@@ -15,11 +15,11 @@
 
 extern "C" {
 
-// MP_CAPI(MpReturnCode) mp__MakeFloatVectorFrame__PA_i(const mediapipe::Anchor3d* value, int size, mediapipe::Packet** packet_out);
-// MP_CAPI(MpReturnCode) mp__MakeFloatVectorFrame_At__PA_i_Rt(const mediapipe::Anchor3d* value, int size, mediapipe::Timestamp* timestamp,
-//                                                                mediapipe::Packet** packet_out);
-MP_CAPI(MpReturnCode) mp_Packet__GetFloatVectorFrame(mediapipe::Packet* packet, mp_api::StructArray<std::vector<float>>* value_out) ;
-MP_CAPI(void) mp_FloatVectorFrame__delete(std::vector<float>* vector_data);
+MP_CAPI(MpReturnCode) mp__MakeFloatVectorFramePacket__PA_i(const float* value, int size, mediapipe::Packet** packet_out);
+MP_CAPI(MpReturnCode) mp__MakeFloatVectorFramePacket_At__PA_i_Rt(const float* value, int size, mediapipe::Timestamp* timestamp,
+                                                               mediapipe::Packet** packet_out);
+MP_CAPI(MpReturnCode) mp_Packet__GetFloatVectorFrame(mediapipe::Packet* packet, const float** value_out);
+MP_CAPI(void) mp_FloatVectorFrame__delete(float* vector_data);
 
 }  // extern "C"
 
