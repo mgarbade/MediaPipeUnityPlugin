@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEngine;
 using Google.Protobuf;
 using UnityEditor;
-
+using System.IO;
 
 namespace Mediapipe.Unity
 {
@@ -45,7 +45,8 @@ namespace Mediapipe.Unity
   public class MatrixClassification : MonoBehaviour
   {
 
-    private readonly string path = "Assets/MediaPipeUnity/Samples/Scenes/Matrix Classification/skeletons_with_neck_squat_trans_36_79.mat";
+    //private readonly string path = "Assets/MediaPipeUnity/Samples/Scenes/Matrix Classification/skeletons_with_neck_squat_trans_36_79.mat";
+    private readonly string path = "Assets\\MediaPipeUnity\\Samples\\Scenes\\Matrix Classification\\skeletons_with_neck_squat_trans_36x79.mat";
     private readonly string TAG = "MatrixClassificationToyExample";
 
     private void OnEnable()
@@ -118,7 +119,7 @@ namespace Mediapipe.Unity
       Debug.Log("Poll output");
       // Create output container with suitable size
       //  -> size should correspond to tflite model output size
-      var outputFloatArray = new float[6] { 10, 11, 12, 13, 14, 15 };
+      var outputFloatArray = new float[23];
       var output = new FloatVectorFramePacket(outputFloatArray);
 
       while (poller.Next(output))
@@ -150,8 +151,9 @@ namespace Mediapipe.Unity
     {
 
       Debug.Log("Create a matrix from file: " + path);
-      var data = Resources.Load<TextAsset>(path);
-      var lines = data.ToString().Split("\n");
+      StreamReader reader = new StreamReader(path);
+      var data = reader.ReadToEnd();
+      var lines = data.Split("\n");
 
       // Get matrix shape from header [num_rows x num_cols]
       var header = lines[0].Split(" ");
@@ -170,10 +172,12 @@ namespace Mediapipe.Unity
         for (int j = 0; j < ncols; j++)
         {
           var numberAsString = line[j];
-
-          matrix.PackedData.Add(float.Parse(numberAsString));
+          var number = float.Parse(numberAsString, System.Globalization.NumberStyles.AllowDecimalPoint,
+            System.Globalization.NumberFormatInfo.InvariantInfo);
+          matrix.PackedData.Add(number);
         }
       }
+
 
       return matrix;
     }
