@@ -99,7 +99,11 @@ namespace Mediapipe.Unity
 
       while (poller.Next(output))
       {
-        Debug.Log(output.Get());
+        var result = output.Get();
+        foreach (var item in result)
+        {
+          Debug.Log("result array:" + item);
+        }
       }
 
 
