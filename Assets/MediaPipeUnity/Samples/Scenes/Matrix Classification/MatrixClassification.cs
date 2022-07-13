@@ -108,7 +108,8 @@ namespace Mediapipe.Unity
       graph.StartRun().AssertOk();
       for (var i = 0; i < 10; i++)
       {
-        var matrix = CreateInputData(path);
+        //var matrix = CreateInputData();
+        var matrix = CreateInputDataFromAscii();
 
         // feed data into graph
         var input = new MatrixFramePacket(matrix.ToByteArray(), new Timestamp(i));
@@ -125,9 +126,9 @@ namespace Mediapipe.Unity
       while (poller.Next(output))
       {
         var result = output.Get();
-        foreach (var item in result)
+        foreach (var item in result.Select((value, i) => new { i, value}))
         {
-          Debug.Log("result array: " + item);
+          Debug.Log("result array: " + item.i + " :" + item.value);
         }
       }
 
@@ -138,7 +139,11 @@ namespace Mediapipe.Unity
       Debug.Log("Done");
     }
 
-    private MatrixData CreateInputData(string path)
+    /// <summary>
+    /// Loads pose estimation result from ascii file. Resulting action should be "squat"
+    /// </summary>
+    /// <returns></returns>
+    private MatrixData CreateInputDataFromAscii()
     {
       // Read data from file
       MatrixData matrix = ReadMatAsciiWithHeader(path);
@@ -146,37 +151,76 @@ namespace Mediapipe.Unity
       return matrix;
     }
 
+    /// <summary>
+    /// Dummy input data for neural network
+    /// </summary>
+    /// <returns></returns>
+    private static MatrixData CreateInputData()
+    {
+      var matrix = new MatrixData();
+
+      var length = 79 * 36;
+      for (int i = 0; i < length; i++)
+      {
+        matrix.PackedData.Add(i);
+      }
+      matrix.Rows = 36;
+      matrix.Cols = 79;
+
+      //matrix.PackedData.Add(0.0f);
+      //matrix.PackedData.Add(1.0f);
+      //matrix.PackedData.Add(2.0f);
+      //matrix.PackedData.Add(3.0f);
+      //matrix.PackedData.Add(4.0f);
+      //matrix.PackedData.Add(5.0f);
+
+      //matrix.Rows = 2;
+      //matrix.Cols = 3;
+      return matrix;
+    }
 
     private MatrixData ReadMatAsciiWithHeader(string path)
     {
 
+      // Read header with shape info [num_rows x num_cols]
       Debug.Log("Create a matrix from file: " + path);
       StreamReader reader = new StreamReader(path);
-      var data = reader.ReadToEnd();
-      var lines = data.Split("\n");
-
-      // Get matrix shape from header [num_rows x num_cols]
-      var header = lines[0].Split(" ");
+      var headerLine = reader.ReadLine();
+      var header = headerLine.Split(" ");
       var nrows = int.Parse(header[0]);
       var ncols = int.Parse(header[1]);
       Debug.Log("matrix shape [nrows x ncols]: " + nrows + " x " + ncols);
 
-      // Fill matrix data
-      var matrix = new MatrixData();
-      matrix.Rows = nrows;
-      matrix.Cols = ncols;
+      // Read matrix data into 2D array
+      var dataLines = reader.ReadToEnd();
+      var lines = dataLines.Split("\n");  // make sure txt file uses LF line endings
+      var floatData = new float[nrows, ncols];
 
-      for (int i = 1; i < nrows; i++)
+      for (var i = 0; i < nrows; i++)
       {
         var line = lines[i].Split(" ");
-        for (int j = 0; j < ncols; j++)
+        for (var j = 0; j < ncols; j++)
         {
           var numberAsString = line[j];
+          // parsing options are necessary to parse numbers with . as decimal delimiter, e.g. [ 130.0156 ]
           var number = float.Parse(numberAsString, System.Globalization.NumberStyles.AllowDecimalPoint,
             System.Globalization.NumberFormatInfo.InvariantInfo);
-          matrix.PackedData.Add(number);
+          floatData[i, j] = number;
         }
       }
+
+      // Fill matrix data
+      var matrix = new MatrixData();
+      for (var i = 0; i < ncols; i++)
+      {
+        for (var j = 0; j < nrows; j++)
+        {
+          matrix.PackedData.Add(floatData[j, i]);
+        }
+      }
+
+      matrix.Rows = nrows;
+      matrix.Cols = ncols;
 
 
       return matrix;
