@@ -1,0 +1,63 @@
+From 9505e235969c8a7d368d2ef97279ad787dbe4b66 Mon Sep 17 00:00:00 2001
+From: Martin Garbade <garbade.work@gmail.com>
+Date: Thu, 22 Sep 2022 18:04:02 +0200
+Subject: [PATCH] compile with local mp
+
+- use local (edited) mediapipe version
+---
+ WORKSPACE | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
+
+diff --git a/WORKSPACE b/WORKSPACE
+index 28f4a6b..dc87198 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -51,23 +51,29 @@ load("@emsdk//:emscripten_deps.bzl", emsdk_emscripten_deps = "emscripten_deps")
+ 
+ emsdk_emscripten_deps(emscripten_version = "2.0.22")
+ 
+-# mediapipe
+-http_archive(
++# # mediapipe
++# http_archive(
++#     name = "com_google_mediapipe",
++#     patch_args = [
++#         "-p1",
++#     ],
++#     patches = [
++#         "@//third_party:mediapipe_opencv.diff",
++#         "@//third_party:mediapipe_workaround.diff",
++#         "@//third_party:mediapipe_visibility.diff",
++#         "@//third_party:mediapipe_model_path.diff",
++#         "@//third_party:mediapipe_extension.diff",
++#         # "@//third_party:mediapipe_emscripten_patch.diff",
++#     ],
++#     sha256 = "6b43a4304ca4aa3a698906e4b4ff696d698d0b788baffd8284c03632712b1020",
++#     strip_prefix = "mediapipe-0.8.10",
++#     urls = ["https://github.com/google/mediapipe/archive/v0.8.10.tar.gz"],
++# )
++
++# use local mediapipe
++local_repository(
+     name = "com_google_mediapipe",
+-    patch_args = [
+-        "-p1",
+-    ],
+-    patches = [
+-        "@//third_party:mediapipe_opencv.diff",
+-        "@//third_party:mediapipe_workaround.diff",
+-        "@//third_party:mediapipe_visibility.diff",
+-        "@//third_party:mediapipe_model_path.diff",
+-        "@//third_party:mediapipe_extension.diff",
+-        # "@//third_party:mediapipe_emscripten_patch.diff",
+-    ],
+-    sha256 = "6b43a4304ca4aa3a698906e4b4ff696d698d0b788baffd8284c03632712b1020",
+-    strip_prefix = "mediapipe-0.8.10",
+-    urls = ["https://github.com/google/mediapipe/archive/v0.8.10.tar.gz"],
++    path = "/home/mp_v16",
+ )
+ 
+ # ABSL cpp library lts_2021_03_24, patch 2.
+-- 
+2.17.1
+
