@@ -93,13 +93,16 @@ namespace Mediapipe.Unity.PoseTracking
       ImageFrame segmentationMask = null;
       NormalizedRect roiFromLandmarks = null;
 
+      float[] poseLandmarksFloat = null;
+      float[] poseWorldLandmarksFloat = null;
+
       if (runningMode == RunningMode.Sync)
       {
-        var _ = graphRunner.TryGetNext(out poseDetection, out poseLandmarks, out poseWorldLandmarks, out segmentationMask, out roiFromLandmarks, true);
+        var _ = graphRunner.TryGetNext(out poseDetection, out poseLandmarks, out poseWorldLandmarks, out segmentationMask, out roiFromLandmarks, out poseLandmarksFloat, out poseWorldLandmarksFloat, true);
       }
       else if (runningMode == RunningMode.NonBlockingSync)
       {
-        yield return new WaitUntil(() => graphRunner.TryGetNext(out poseDetection, out poseLandmarks, out poseWorldLandmarks, out segmentationMask, out roiFromLandmarks, false));
+        yield return new WaitUntil(() => graphRunner.TryGetNext(out poseDetection, out poseLandmarks, out poseWorldLandmarks, out segmentationMask, out roiFromLandmarks, out poseLandmarksFloat, out poseWorldLandmarksFloat, false));
       }
 
       _poseDetectionAnnotationController.DrawNow(poseDetection);

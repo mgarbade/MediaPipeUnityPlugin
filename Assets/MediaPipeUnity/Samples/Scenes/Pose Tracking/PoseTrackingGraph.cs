@@ -77,12 +77,17 @@ namespace Mediapipe.Unity.PoseTracking
     private const string _PoseWorldLandmarksStreamName = "pose_world_landmarks";
     private const string _SegmentationMaskStreamName = "segmentation_mask";
     private const string _RoiFromLandmarksStreamName = "roi_from_landmarks";
+    private const string _PoseLandmarksFloatStreamName = "pose_landmarks_float";
+    private const string _PoseWorldLandmarksFloatStreamName = "pose_world_landmarks_float";
 
     private OutputStream<DetectionPacket, Detection> _poseDetectionStream;
     private OutputStream<NormalizedLandmarkListPacket, NormalizedLandmarkList> _poseLandmarksStream;
     private OutputStream<LandmarkListPacket, LandmarkList> _poseWorldLandmarksStream;
     private OutputStream<ImageFramePacket, ImageFrame> _segmentationMaskStream;
     private OutputStream<NormalizedRectPacket, NormalizedRect> _roiFromLandmarksStream;
+
+    private OutputStream<FloatVectorPacket, float[]> _poseLandmarksFloatStream;
+    private OutputStream<FloatVectorPacket, float[]> _poseWorldLandmarksFloatStream;
 
     public override void StartRun(ImageSource imageSource)
     {
@@ -93,6 +98,9 @@ namespace Mediapipe.Unity.PoseTracking
         _poseWorldLandmarksStream.StartPolling().AssertOk();
         _segmentationMaskStream.StartPolling().AssertOk();
         _roiFromLandmarksStream.StartPolling().AssertOk();
+
+        _poseLandmarksFloatStream.StartPolling().AssertOk();
+        _poseWorldLandmarksFloatStream.StartPolling().AssertOk();
       }
       StartRun(BuildSidePacket(imageSource));
     }
@@ -109,6 +117,13 @@ namespace Mediapipe.Unity.PoseTracking
       _segmentationMaskStream = null;
       _roiFromLandmarksStream?.Close();
       _roiFromLandmarksStream = null;
+
+
+      _poseLandmarksFloatStream?.Close();
+      _poseLandmarksFloatStream = null;
+      _poseWorldLandmarksFloatStream?.Close();
+      _poseWorldLandmarksFloatStream = null;
+
       base.Stop();
     }
 
@@ -117,7 +132,9 @@ namespace Mediapipe.Unity.PoseTracking
       AddTextureFrameToInputStream(_InputStreamName, textureFrame);
     }
 
-    public bool TryGetNext(out Detection poseDetection, out NormalizedLandmarkList poseLandmarks, out LandmarkList poseWorldLandmarks, out ImageFrame segmentationMask, out NormalizedRect roiFromLandmarks, bool allowBlock = true)
+    public bool TryGetNext(out Detection poseDetection, out NormalizedLandmarkList poseLandmarks, out LandmarkList poseWorldLandmarks,
+      out ImageFrame segmentationMask, out NormalizedRect roiFromLandmarks,
+      out float[] poseLandmarksFloat, out float[] poseWorldLandmarksFloat, bool allowBlock = true)
     {
       var currentTimestampMicrosec = GetCurrentTimestampMicrosec();
       var r1 = TryGetNext(_poseDetectionStream, out poseDetection, allowBlock, currentTimestampMicrosec);
@@ -126,7 +143,11 @@ namespace Mediapipe.Unity.PoseTracking
       var r4 = TryGetNext(_segmentationMaskStream, out segmentationMask, allowBlock, currentTimestampMicrosec);
       var r5 = TryGetNext(_roiFromLandmarksStream, out roiFromLandmarks, allowBlock, currentTimestampMicrosec);
 
-      return r1 || r2 || r3 || r4 || r5;
+      // get poseLandmarks as floats
+      var r6 = TryGetNext(_poseLandmarksFloatStream, out poseLandmarksFloat, allowBlock, currentTimestampMicrosec);
+      var r7 = TryGetNext(_poseWorldLandmarksFloatStream, out poseWorldLandmarksFloat, allowBlock, currentTimestampMicrosec);
+
+      return r1 || r2 || r3 || r4 || r5 || r6 || r7;
     }
 
     protected override IList<WaitForResult> RequestDependentAssets()
@@ -151,6 +172,11 @@ namespace Mediapipe.Unity.PoseTracking
             calculatorGraph, _SegmentationMaskStreamName, config.AddPacketPresenceCalculator(_SegmentationMaskStreamName), timeoutMicrosec);
         _roiFromLandmarksStream = new OutputStream<NormalizedRectPacket, NormalizedRect>(
             calculatorGraph, _RoiFromLandmarksStreamName, config.AddPacketPresenceCalculator(_RoiFromLandmarksStreamName), timeoutMicrosec);
+
+        _poseLandmarksFloatStream = new OutputStream<FloatVectorPacket, float[]>(
+            calculatorGraph, _PoseLandmarksFloatStreamName, config.AddPacketPresenceCalculator(_PoseLandmarksFloatStreamName), timeoutMicrosec);
+        _poseWorldLandmarksFloatStream = new OutputStream<FloatVectorPacket, float[]>(
+            calculatorGraph, _PoseWorldLandmarksFloatStreamName, config.AddPacketPresenceCalculator(_PoseWorldLandmarksFloatStreamName), timeoutMicrosec);
       }
       else
       {
@@ -159,6 +185,9 @@ namespace Mediapipe.Unity.PoseTracking
         _poseWorldLandmarksStream = new OutputStream<LandmarkListPacket, LandmarkList>(calculatorGraph, _PoseWorldLandmarksStreamName, true, timeoutMicrosec);
         _segmentationMaskStream = new OutputStream<ImageFramePacket, ImageFrame>(calculatorGraph, _SegmentationMaskStreamName, true, timeoutMicrosec);
         _roiFromLandmarksStream = new OutputStream<NormalizedRectPacket, NormalizedRect>(calculatorGraph, _RoiFromLandmarksStreamName, true, timeoutMicrosec);
+
+        _poseLandmarksFloatStream = new OutputStream<FloatVectorPacket, float[]>(calculatorGraph, _PoseLandmarksFloatStreamName, true, timeoutMicrosec);
+        _poseWorldLandmarksFloatStream = new OutputStream<FloatVectorPacket, float[]>(calculatorGraph, _PoseWorldLandmarksFloatStreamName, true, timeoutMicrosec);
       }
 
       using (var validatedGraphConfig = new ValidatedGraphConfig())
