@@ -52,22 +52,27 @@ load("@emsdk//:emscripten_deps.bzl", emsdk_emscripten_deps = "emscripten_deps")
 emsdk_emscripten_deps(emscripten_version = "2.0.22")
 
 # mediapipe
-http_archive(
-    name = "com_google_mediapipe",
-    patch_args = [
-        "-p1",
-    ],
-    patches = [
-        "@//third_party:mediapipe_opencv.diff",
-        "@//third_party:mediapipe_workaround.diff",
-        "@//third_party:mediapipe_visibility.diff",
-        "@//third_party:mediapipe_model_path.diff",
-        "@//third_party:mediapipe_extension.diff",
-        # "@//third_party:mediapipe_emscripten_patch.diff",
-    ],
-    sha256 = "6b43a4304ca4aa3a698906e4b4ff696d698d0b788baffd8284c03632712b1020",
-    strip_prefix = "mediapipe-0.8.10",
-    urls = ["https://github.com/google/mediapipe/archive/v0.8.10.tar.gz"],
+#http_archive(
+#    name = "com_google_mediapipe",
+#    patch_args = [
+#        "-p1",
+#    ],
+#    patches = [
+#        "@//third_party:mediapipe_opencv.diff",
+#        "@//third_party:mediapipe_workaround.diff",
+#        "@//third_party:mediapipe_visibility.diff",
+#        "@//third_party:mediapipe_model_path.diff",
+#        "@//third_party:mediapipe_extension.diff",
+#        # "@//third_party:mediapipe_emscripten_patch.diff",
+#    ],
+#    sha256 = "6b43a4304ca4aa3a698906e4b4ff696d698d0b788baffd8284c03632712b1020",
+#    strip_prefix = "mediapipe-0.8.10",
+#    urls = ["https://github.com/google/mediapipe/archive/v0.8.10.tar.gz"],
+#)
+
+local_repository(
+	name = "com_google_mediapipe",
+	path = "../mp_v16",
 )
 
 # ABSL cpp library lts_2021_03_24, patch 2.
