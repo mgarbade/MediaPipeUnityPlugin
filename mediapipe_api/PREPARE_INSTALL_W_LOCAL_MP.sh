@@ -1,5 +1,5 @@
-sudo apt-get update
-sudo apt-get install vim
+sudo apt -y update 
+sudo apt -y install vim 
 
 
 # prepare mediapipe
@@ -15,7 +15,7 @@ cd ..
 
 # make WORKSPACE file use local mediapipe
 cd mediapipe
-git apply Assets/compile_with_local_mp.patch
+# git apply Assets/compile_with_local_mp.patch
 
 # apply patches
 cd ..
@@ -31,6 +31,8 @@ git apply -p1 ../mediapipe/third_party/mediapipe_extension.diff
 cd ..
 cd mediapipe
 
+echo "apply compile_with_local_mp.patch"
+echo "then"
 echo "execute this command manually (without sudo)"
 echo "python build.py build --android fat --android_ndk_api_level 21 --solutions pose -vv --opencv cmake -v --linkopt=-s"
 
